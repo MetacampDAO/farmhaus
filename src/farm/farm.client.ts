@@ -7,7 +7,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 import { Farm } from '../../target/types/farm';
-import { AccountUtils } from '../farm-common';
+import { AccountUtils, isKp } from '../farm-common';
 
 export class FarmClient extends AccountUtils {
   // @ts-ignore
@@ -51,5 +51,32 @@ export class FarmClient extends AccountUtils {
       // @ts-ignore
       this.farmProgram = anchor.workspace.Farm as Program<Farm>;
     }
+  }
+
+  // --------------------------------------- execute ixs
+
+  async initFarm(
+    farm: Keypair,
+    manager: PublicKey | Keypair,
+    payer: PublicKey | Keypair
+  ) {
+    const signers = [farm];
+    if (isKp(manager)) signers.push(<Keypair>manager);
+
+    console.log('starting farm at', farm.publicKey.toBase58());
+    const txSig = await this.farmProgram.methods.initFarm().accounts({
+        farm: farm.publicKey,
+        manager: isKp(manager) ? (<Keypair>manager).publicKey : manager,
+        payer: isKp(payer) ? (<Keypair>payer).publicKey : payer,
+        systemProgram: SystemProgram.programId,
+      }).signers(signers).rpc();
+
+    return { txSig };
+  }
+
+  // --------------------------------------- fetch deserialized accounts
+
+  async fetchFarmAcc(farm: PublicKey) {
+    return this.farmProgram.account.farm.fetch(farm);
   }
 }
