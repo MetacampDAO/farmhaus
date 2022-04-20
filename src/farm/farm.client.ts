@@ -57,16 +57,16 @@ export class FarmClient extends AccountUtils {
 
   async initFarm(
     farm: Keypair,
-    manager: PublicKey | Keypair,
+    developer: PublicKey | Keypair,
     payer: PublicKey | Keypair
   ) {
     const signers = [farm];
-    if (isKp(manager)) signers.push(<Keypair>manager);
+    if (isKp(developer)) signers.push(<Keypair>developer);
 
     console.log('starting farm at', farm.publicKey.toBase58());
     const txSig = await this.farmProgram.methods.initFarm().accounts({
         farm: farm.publicKey,
-        manager: isKp(manager) ? (<Keypair>manager).publicKey : manager,
+        developer: isKp(developer) ? (<Keypair>developer).publicKey : developer,
         payer: isKp(payer) ? (<Keypair>payer).publicKey : payer,
         systemProgram: SystemProgram.programId,
       }).signers(signers).rpc();

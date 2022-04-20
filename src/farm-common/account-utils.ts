@@ -10,7 +10,7 @@ import {
 export interface ITokenData {
   tokenMint: PublicKey;
   tokenAcc: PublicKey;
-  owner: PublicKey;
+  developer: PublicKey;
   token: Token;
 }
 
@@ -74,12 +74,12 @@ export class AccountUtils {
     return token.getAccountInfo(tokenAccount);
   }
 
-  async findATA(mint: PublicKey, owner: PublicKey): Promise<PublicKey> {
+  async findATA(mint: PublicKey, developer: PublicKey): Promise<PublicKey> {
     return Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
       mint,
-      owner
+      developer
     );
   }
 }

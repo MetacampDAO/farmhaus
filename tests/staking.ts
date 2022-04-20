@@ -15,26 +15,26 @@ describe('farm', () => {
   //global state
   let randomWallet: Keypair; //used to test bad transactions with wrong account passed in
   const farm = Keypair.generate();
-  let manager: Keypair;
+  let developer: Keypair;
 
   function printFarmVaultState() {
     console.log('randomWallet', randomWallet.publicKey.toBase58());
     console.log('farm', farm.publicKey.toBase58());
-    console.log('manager', manager.publicKey.toBase58());
+    console.log('developer', developer.publicKey.toBase58());
   }
 
   before('configures accounts', async () => {
     randomWallet = await nw.createFundedWallet(100 * LAMPORTS_PER_SOL);
-    manager = await nw.createFundedWallet(100 * LAMPORTS_PER_SOL);
+    developer = await nw.createFundedWallet(100 * LAMPORTS_PER_SOL);
   });
 
   it('inits farm', async () => {
-    await farmClient.initFarm(farm, manager, manager);
+    await farmClient.initFarm(farm, developer, developer);
 
     const farmAcc = await farmClient.fetchFarmAcc(farm.publicKey);
     assert.equal(
-      farmAcc.manager.toBase58(),
-      manager.publicKey.toBase58()
+      farmAcc.developer.toBase58(),
+      developer.publicKey.toBase58()
     );
     assert(farmAcc.vaultCount.eq(new BN(0)));
   });

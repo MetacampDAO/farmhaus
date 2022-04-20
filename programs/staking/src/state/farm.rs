@@ -9,14 +9,14 @@ pub const LATEST_FARM_VERSION: u16 = 0;
 pub struct Farm {
     pub version: u16,
 
-    /// sole control over gem whitelist, un/locking the vaults, and farm flags
+    /// sole control over NFT whitelist, un/locking the vaults, and farm flags
     /// can update itself to another Pubkey
-    pub manager: Pubkey,
+    pub developer: Pubkey,
 
     pub flags: u32,
 
-    /// only gems allowed will be those that have EITHER a:
-    /// 1) creator from this list
+    /// only NFTs allowed will be those that have EITHER a:
+    /// 1) creator from this list3
     pub whitelisted_creators: u32,
     /// OR
     /// 2) mint from this list

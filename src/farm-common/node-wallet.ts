@@ -61,20 +61,20 @@ export class NodeWallet extends AccountUtils {
 
   async createAndFundATA(
     token: Token,
-    owner: PublicKey,
+    developer: PublicKey,
     amount: BN
   ): Promise<PublicKey> {
     if (token.publicKey == NATIVE_MINT) {
       const account = await Token.createWrappedNativeAccount(
         this.conn,
         TOKEN_PROGRAM_ID,
-        owner,
+        developer,
         this.wallet.payer,
         amount.toNumber()
       );
       return account;
     } else {
-      const account = await token.createAssociatedTokenAccount(owner);
+      const account = await token.createAssociatedTokenAccount(developer);
       if (amount.toNumber() > 0) {
         await token.mintTo(account, this.wallet.payer, [], amount.toNumber());
       }
@@ -83,15 +83,15 @@ export class NodeWallet extends AccountUtils {
   }
 
   async createMintAndFundATA(
-    owner: PublicKey,
+    developer: PublicKey,
     amount: BN
   ): Promise<ITokenData> {
     const token = await this.createMint(0);
-    const tokenAcc = await this.createAndFundATA(token, owner, amount);
+    const tokenAcc = await this.createAndFundATA(token, developer, amount);
     return {
       tokenMint: token.publicKey,
       tokenAcc,
-      owner,
+      developer,
       token,
     } as ITokenData;
   }
