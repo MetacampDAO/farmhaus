@@ -39,4 +39,26 @@ describe('farm', () => {
     assert(farmAcc.vaultCount.eq(new BN(0)));
   });
 
+  it('updates developer', async () => {
+    const newDeveloper = Keypair.generate();
+    await farmClient.updateDeveloper(
+      farm.publicKey,
+      developer,
+      newDeveloper.publicKey
+    );
+
+    const farmAcc = await farmClient.fetchFarmAcc(farm.publicKey);
+    assert.equal(
+      farmAcc.developer.toBase58(),
+      newDeveloper.publicKey.toBase58()
+    );
+
+    //reset back
+    await farmClient.updateDeveloper(
+      farm.publicKey,
+      newDeveloper,
+      developer.publicKey
+    );
+  });
+
 });

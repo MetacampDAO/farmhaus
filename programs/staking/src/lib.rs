@@ -13,4 +13,8 @@ pub mod farm {
     pub fn init_farm(ctx: Context<InitFarm>) -> Result<()> {
         instructions::init_farm::handler(ctx)
     }
+
+    pub fn update_developer(ctx: Context<UpdateDeveloper>) -> Result<()> {
+        instructions::update_developer::handler(ctx)
+    }
 }

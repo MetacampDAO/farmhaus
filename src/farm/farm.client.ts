@@ -53,6 +53,12 @@ export class FarmClient extends AccountUtils {
     }
   }
 
+  // --------------------------------------- fetch deserialized accounts
+
+  async fetchFarmAcc(farm: PublicKey) {
+    return this.farmProgram.account.farm.fetch(farm);
+  }
+
   // --------------------------------------- execute ixs
 
   async initFarm(
@@ -74,9 +80,23 @@ export class FarmClient extends AccountUtils {
     return { txSig };
   }
 
-  // --------------------------------------- fetch deserialized accounts
+  async updateDeveloper(
+    farm: PublicKey,
+    developer: PublicKey | Keypair,
+    newDeveloper: PublicKey
+  ) {
+    const signers = [];
+    if (isKp(developer)) signers.push(<Keypair>developer);
 
-  async fetchFarmAcc(farm: PublicKey) {
-    return this.farmProgram.account.farm.fetch(farm);
+    console.log('updating developer to ', newDeveloper.toBase58());
+    const txSig = await this.farmProgram.methods.updateDeveloper().accounts({
+      farm: farm,
+      developer: isKp(developer)
+        ? (<Keypair>developer).publicKey
+        : developer,
+      newDeveloper: newDeveloper
+    }).signers(signers).rpc();
+
+    return {txSig };
   }
 }
