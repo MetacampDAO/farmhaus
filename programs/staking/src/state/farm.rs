@@ -3,7 +3,7 @@ use farm_common::errors::ErrorCode;
 
 pub const LATEST_FARM_VERSION: u16 = 0;
 
-#[proc_macros::assert_size(120)] // +2 to make it /8
+#[proc_macros::assert_size(120)] // +6 to make it /8
 #[repr(C)]
 #[account]
 pub struct Farm {
@@ -12,8 +12,6 @@ pub struct Farm {
     /// sole control over NFT whitelist, un/locking the vaults, and farm flags
     /// can update itself to another Pubkey
     pub developer: Pubkey,
-
-    pub flags: u32,
 
     /// only NFTs allowed will be those that have EITHER a:
     /// 1) creator from this list3
@@ -30,17 +28,4 @@ pub struct Farm {
 }
 
 impl Farm {
-    pub fn read_flags(flags: u32) -> Result<FarmFlags> {
-        FarmFlags::from_bits(flags).ok_or(error!(ErrorCode::InvalidParameter))
-    }
-
-    pub fn reset_flags(&mut self, flags: FarmFlags) {
-        self.flags = flags.bits();
-    }
-}
-
-bitflags::bitflags! {
-    pub struct FarmFlags: u32 {
-        const FREEZE_VAULTS = 1 << 0;
-    }
 }
