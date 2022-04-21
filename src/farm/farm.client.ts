@@ -8,6 +8,12 @@ import {
 } from '@solana/spl-token';
 import { Farm } from '../../target/types/farm';
 import { AccountUtils, isKp } from '../farm-common';
+import { findWhitelistProofPDA } from './farm.pda';
+
+export enum WhitelistType {
+  Creator = 1 << 0,
+  Mint = 1 << 1,
+}
 
 export class FarmClient extends AccountUtils {
   // @ts-ignore
@@ -59,6 +65,48 @@ export class FarmClient extends AccountUtils {
     return this.farmProgram.account.farm.fetch(farm);
   }
 
+  async fetchWhitelistProofAcc(proof: PublicKey) {
+    return this.farmProgram.account.whitelistProof.fetch(proof);
+  }
+
+  // --------------------------------------- get all PDAs by type
+  //https://project-serum.github.io/anchor/ts/classes/accountclient.html#all
+
+  async fetchAllFarmPDAs(manager?: PublicKey) {
+    const filter = manager
+      ? [
+          {
+            memcmp: {
+              offset: 10, //need to prepend 8 bytes for anchor's disc
+              bytes: manager.toBase58(),
+            },
+          },
+        ]
+      : [];
+    const pdas = await this.farmProgram.account.farm.all(filter);
+    console.log(`found a total of ${pdas.length} farm PDAs`);
+    return pdas;
+  }
+
+  async fetchAllWhitelistProofPDAs(farm?: PublicKey) {
+    const filter = farm
+      ? [
+          {
+            memcmp: {
+              offset: 41, //need to prepend 8 bytes for anchor's disc
+              bytes: farm.toBase58(),
+            },
+          },
+        ]
+      : [];
+    const pdas = await this.farmProgram.account.whitelistProof.all(filter);
+    console.log(`found a total of ${pdas.length} whitelist proofs`);
+    return pdas;
+  }
+  
+
+
+
   // --------------------------------------- execute ixs
 
   async initFarm(
@@ -98,5 +146,36 @@ export class FarmClient extends AccountUtils {
     }).signers(signers).rpc();
 
     return {txSig };
+  }
+
+  async addToWhitelist(
+    farm: PublicKey,
+    developer: PublicKey | Keypair,
+    addressToWhitelist: PublicKey,
+    whitelistType: WhitelistType,
+    payer?: PublicKey
+  ) {
+    const developerPk = isKp(developer)
+      ? (<Keypair>developer).publicKey
+      : <PublicKey>developer;
+
+    const [whitelistProof, whitelistBump] = await findWhitelistProofPDA(
+      farm,
+      addressToWhitelist
+    );
+
+    const signers = [];
+    if (isKp(developer)) signers.push(<Keypair>developer);
+
+    const txSig = await this.farmProgram.methods.addToWhitelist(whitelistType).accounts({
+      farm,
+      developer: developerPk,
+      addressToWhitelist,
+      whitelistProof,
+      systemProgram: SystemProgram.programId,
+      payer: payer?? developerPk,
+    }).signers(signers).rpc();
+
+    return { whitelistProof, whitelistBump, txSig };
   }
 }

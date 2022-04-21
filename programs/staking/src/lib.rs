@@ -17,4 +17,8 @@ pub mod farm {
     pub fn update_developer(ctx: Context<UpdateDeveloper>) -> Result<()> {
         instructions::update_developer::handler(ctx)
     }
+
+    pub fn add_to_whitelist(ctx: Context<AddToWhitelist>, whitelist_type: u8) -> Result<()> {
+        instructions::add_to_whitelist::handler(ctx, whitelist_type)
+    }
 }

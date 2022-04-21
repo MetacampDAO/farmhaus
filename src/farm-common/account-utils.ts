@@ -10,7 +10,7 @@ import {
 export interface ITokenData {
   tokenMint: PublicKey;
   tokenAcc: PublicKey;
-  developer: PublicKey;
+  owner: PublicKey;
   token: Token;
 }
 

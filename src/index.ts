@@ -4,5 +4,5 @@ export * from './farm';
 export * from './farm-common';
 
 export const FARM_PROG_ID = new PublicKey(
-  'bankHHdqMuaaST4qQk6mkzxGeKPHWmqdgor6Gs8r88m'
+  'Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS'
 );
